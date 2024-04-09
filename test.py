@@ -1,29 +1,37 @@
-dyrektor = [41,27,35,33,25,47,38,53,43,35,36]
-wizytator = [38,24,34,29,27,47,43,52,39,31,29]
+import numpy as np
 
-def nadawanie_rang(wartosci):
-    wartosci_sorted = wartosci.copy()
-    wartosci_sorted.sort(reverse=True)
-    rangi = [0]*len(wartosci)
-    for i in range(len(wartosci_sorted)):
-        ile = wartosci.count(wartosci_sorted[i]) 
-        if ile == 1:
-            ind = wartosci.index(wartosci_sorted[i])
-            rangi[ind] = i + 1
-        else:
-            ind_sum = ile
-            inds = []
-            for j in range(len(wartosci)):
-                if wartosci_sorted[i] == wartosci[j]:
-                    inds.append(j)
+# Funkcja obliczająca wartość średnią dla rozkładu lognormalnego
+def lognormal_mean(mu, sigma):
+    return np.exp(mu + sigma**2 / 2)
 
-            for k in range(len(wartosci_sorted)):
-                if wartosci_sorted[i] == wartosci_sorted[k]:
-                    ind_sum += k
-                    
-            ranga = ind_sum/ile
-            for ind in inds:
-                rangi[ind] = ranga
-    return rangi
+# Parametry rozkładu lognormalnego
+mu = 0.5  # średnia logarytmu
+sigma = 0.3  # odchylenie standardowe logarytmu
 
-print(nadawanie_rang(dyrektor))
+# Wartość oczekiwana (średnia) dla rozkładu lognormalnego
+mean_lognormal = lognormal_mean(mu, sigma)
+print("Średnia dla rozkładu lognormalnego:", mean_lognormal)
+
+# Liczba próbek w próbie
+n = 10000
+
+# Generowanie próby z rozkładu lognormalnego
+lognormal_samples = np.random.lognormal(mu, sigma, n)
+
+# Średnia z próby
+sample_mean = np.mean(lognormal_samples)
+print("Średnia z próby:", sample_mean)
+
+# Sprawdzenie, czy średnia z próby jest nieobciążonym estymatorem parametru średniej
+# Wykonujemy wielokrotnie symulację prób i obliczamy średnią z prób
+num_simulations = 1000
+sample_means = np.zeros(num_simulations)
+for i in range(num_simulations):
+    sample = np.random.lognormal(mu, sigma, n)
+    sample_means[i] = np.mean(sample)
+
+# Obliczamy odchylenie standardowe średnich z prób
+std_sample_means = np.std(sample_means)
+
+print("Średnia z prób:", np.mean(sample_means))
+print("Odchylenie standardowe średnich z prób:", std_sample_means)
