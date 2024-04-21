@@ -1,37 +1,44 @@
 import numpy as np
 
-# Funkcja obliczająca wartość średnią dla rozkładu lognormalnego
-def lognormal_mean(mu, sigma):
-    return np.exp(mu + sigma**2 / 2)
+# Liczba iteracji eksperymentu
+n_iterations = 100
 
-# Parametry rozkładu lognormalnego
-mu = 0.5  # średnia logarytmu
-sigma = 0.3  # odchylenie standardowe logarytmu
+# Liczba danych w próbce
+n_data = 2 * n_iterations + 1
 
-# Wartość oczekiwana (średnia) dla rozkładu lognormalnego
-mean_lognormal = lognormal_mean(mu, sigma)
-print("Średnia dla rozkładu lognormalnego:", mean_lognormal)
+# Pusta lista do przechowywania błędów średniokwadratowych dla próbkowej średniej
+mse_mean_estimate = []
 
-# Liczba próbek w próbie
-n = 10000
+# Pusta lista do przechowywania błędów średniokwadratowych dla próbkowej mediany
+mse_median_estimate = []
 
-# Generowanie próby z rozkładu lognormalnego
-lognormal_samples = np.random.lognormal(mu, sigma, n)
+# Powtórz eksperyment n_iterations razy
+for _ in range(n_iterations):
+    # Wygeneruj próbkę z rozkładu normalnego
+    sample = np.random.normal(loc=0, scale=1, size=n_data)
+    
+    # Oblicz estymator próbkowej średniej
+    mean_estimate = np.mean(sample)
+    
+    # Oblicz estymator próbkowej mediany
+    median_estimate = np.median(sample)
+    
+    # Oblicz błąd średniokwadratowy dla próbkowej średniej
+    mse_mean = (mean_estimate - 0)**2
+    
+    # Oblicz błąd średniokwadratowy dla próbkowej mediany
+    mse_median = (median_estimate - 0)**2
+    
+    # Dodaj błędy średniokwadratowe do list
+    mse_mean_estimate.append(mse_mean)
+    mse_median_estimate.append(mse_median)
 
-# Średnia z próby
-sample_mean = np.mean(lognormal_samples)
-print("Średnia z próby:", sample_mean)
+# Oblicz średnią z błędów średniokwadratowych dla próbkowej średniej
+mean_mse_mean_estimate = np.mean(mse_mean_estimate)
 
-# Sprawdzenie, czy średnia z próby jest nieobciążonym estymatorem parametru średniej
-# Wykonujemy wielokrotnie symulację prób i obliczamy średnią z prób
-num_simulations = 1000
-sample_means = np.zeros(num_simulations)
-for i in range(num_simulations):
-    sample = np.random.lognormal(mu, sigma, n)
-    sample_means[i] = np.mean(sample)
+# Oblicz średnią z błędów średniokwadratowych dla próbkowej mediany
+mean_mse_median_estimate = np.mean(mse_median_estimate)
 
-# Obliczamy odchylenie standardowe średnich z prób
-std_sample_means = np.std(sample_means)
-
-print("Średnia z prób:", np.mean(sample_means))
-print("Odchylenie standardowe średnich z prób:", std_sample_means)
+# Wyświetl wyniki
+print("Średni błąd średniokwadratowy dla próbkowej średniej:", mean_mse_mean_estimate)
+print("Średni błąd średniokwadratowy dla próbkowej mediany:", mean_mse_median_estimate)
